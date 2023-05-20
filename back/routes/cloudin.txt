@@ -1,0 +1,17 @@
+  const { title, status, photo } = req.body;
+  try {
+    if (photo) {
+      const cloudimage = await cloud.uploader.upload(photo, {
+        upload_preset: "travel-Images",
+      });
+      if (cloudimage) {
+        console.log(cloudimage);
+
+        const data = new todo({ title, status, photo: cloudimage.secure_url });
+        await data.save();
+        res.status(200).json("added");
+      }
+    }
+  } catch (error) {
+    res.status(400).send(error);
+  }
