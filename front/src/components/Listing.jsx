@@ -43,6 +43,12 @@ const Listing = ({ list }) => {
   return (
     <div>
       <div className="flex flex-col items-center justify-center mt-4">
+        {lists.length >
+          0(
+            <div className="text-black  m-2">
+              Click on the text to update the task.
+            </div>
+          )}
         <div className="flex w-full items-center justify-center">
           {updating && (
             <>
