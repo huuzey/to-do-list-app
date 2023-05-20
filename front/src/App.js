@@ -6,7 +6,7 @@ import { getLists } from "./reducer";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Upload from "./components/Input";
-const BASE_URL = "http://localhost:9000";
+const BASE_URL = "https://to-do-list-app-ue7g.onrender.com";
 function App() {
   const dispatch = useDispatch();
   const { lists } = useSelector((store) => store.list);
