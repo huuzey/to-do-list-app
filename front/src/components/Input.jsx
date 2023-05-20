@@ -1,72 +1,48 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import BASE_URL from "../App";
+import axios from "axios";
+import { listcontext } from "../reducer";
 
 const Upload = () => {
+  const { lists, setlists } = useContext(listcontext);
+
   const [fileInputState, setFileInputState] = useState("");
-  const [previewSource, setPreviewSource] = useState("");
-  const [selectedFile, setSelectedFile] = useState();
-
-  const handleFileInputChange = (e) => {
-    const file = e.target.files[0];
-    previewFile(file);
-    setSelectedFile(file);
-    setFileInputState(e.target.value);
+  const fetch = async () => {
+    const data = await axios.get(`${BASE_URL}/get`);
+    setlists(data?.data);
+    setFileInputState("");
   };
-
-  const handleSubmitFile = (e) => {
+  const handleSubmitFile = async (e) => {
     e.preventDefault();
-    if (!selectedFile) return;
-    const reader = new FileReader();
-    reader.readAsDataURL(selectedFile);
-    reader.onloadend = () => {
-      uploadImage(reader.result);
-    };
-    reader.onerror = () => {
-      console.error("Error");
-    };
-  };
-
-  const uploadImage = async (base64EncodedImage) => {
-    try {
-      await fetch(`${BASE_URL}/add`, {
-        method: "POST",
-        body: JSON.stringify({ data: base64EncodedImage }),
-        headers: { "Content-Type": "application/json" },
-      });
-      setFileInputState("");
-      setPreviewSource("");
-    } catch (err) {
-      console.error("front remain");
+    if (fileInputState) {
+      try {
+        await axios.post(`${BASE_URL}/add`, { title: fileInputState });
+        fetch();
+        console.log("sent successfully");
+      } catch (error) {
+        console.log(error);
+      }
     }
-  };
-
-  const previewFile = (file) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend = () => {
-      setPreviewSource(reader.result);
-    };
   };
 
   return (
     <div>
-      <h1>Upload</h1>
       <form onSubmit={handleSubmitFile} className="form">
         <input
-          id="fileInput"
-          type="file"
-          name="image"
-          onChange={handleFileInputChange}
+          type="text"
+          name="text"
+          placeholder="what do you wanna do ?"
+          onChange={(e) => setFileInputState(e.target.value)}
           value={fileInputState}
-          className="form-input"
+          className="bg-slate-300 text-black mx-2 px-4 rounded-lg mt-4 "
         />
-        <button className="btn" type="submit">
+        <button
+          className="bg-[#a01094] rounded-lg px-2 hover:scale-110 hover:text-[#16b288]"
+          type="submit"
+        >
           Submit
         </button>
       </form>
-      {previewSource && (
-        <img src={previewSource} alt="chosen" style={{ height: "300px" }} />
-      )}
     </div>
   );
 };

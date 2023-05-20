@@ -4,25 +4,15 @@ const cloud = require("../utils/config");
 const router = require("express").Router();
 
 router.post("/add", async (req, res) => {
-  const photo = req.body.data;
+  const { title } = req.body;
+  console.log(title);
   try {
-    if (photo) {
-      const fetchedcloud = await cloud.uploader.upload(photo, {
-        upload_preset: "react_cloudinary",
-      });
-      console.log(fetchedcloud);
-      res.status(200).send({ msg: "successfully uploaded" });
-    }
+    const created = new todo({ title });
+    await created.save();
+    res.status(200).json("added successfully");
   } catch (error) {
-    res.status(500).send("can not uplload image");
-  }
-});
-router.get("/get", async (req, res) => {
-  try {
-    const data = await todo.find();
-    res.status(200).send(data);
-  } catch (error) {
-    res.status(400).send(error);
+    res.status(500).send(error);
+    console.log(error);
   }
 });
 router.patch("/:id", async (req, res) => {
@@ -53,6 +43,15 @@ router.delete("/:id", async (req, res) => {
     }
   } catch (error) {
     res.status(400).send(error);
+  }
+});
+router.get("/get", async (req, res) => {
+  try {
+    const finds = await todo.find();
+    res.status(200).send(finds);
+  } catch (error) {
+    res.status(500).send(error);
+    console.log(error);
   }
 });
 

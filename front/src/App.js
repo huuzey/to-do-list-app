@@ -1,18 +1,19 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "./App.css";
-import Input from "./components/Input";
-import { getLists } from "./reducer";
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import Upload from "./components/Input";
+import { listcontext } from "./reducer";
+import Upload from "./pages/upload";
 const BASE_URL = "https://to-do-list-app-ue7g.onrender.com";
-function App() {
-  const dispatch = useDispatch();
-  const { lists } = useSelector((store) => store.list);
+export function App() {
+  const { lists, setlists } = useContext(listcontext);
+
+  const fetch = async () => {
+    const data = await axios.get(`${BASE_URL}/get`);
+    setlists(data?.data);
+  };
 
   useEffect(() => {
-    dispatch(getLists());
+    fetch();
   }, []);
 
   const addToDo = async (ons) => {
@@ -20,8 +21,7 @@ function App() {
 
     try {
       await axios.post(`${BASE_URL}/add`, ons);
-      dispatch(getLists());
-
+      fetch();
       console.log("sent successfully");
     } catch (error) {
       console.log("ons reised");
@@ -29,9 +29,8 @@ function App() {
   };
   return (
     <div className="App">
-      <Upload />{" "}
+      <Upload />
     </div>
   );
 }
-
-export default { App, BASE_URL };
+export default BASE_URL;

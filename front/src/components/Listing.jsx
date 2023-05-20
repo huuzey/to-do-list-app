@@ -1,18 +1,23 @@
 import axios from "axios";
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { getLists } from "../reducer";
+import React, { useContext, useState } from "react";
+import { listcontext } from "../reducer";
 import BASE_URL from "../App";
 
 const Listing = ({ list }) => {
   const [updating, setupdating] = useState(false);
   const [id, setid] = useState(null);
   const [uptext, setuptext] = useState("");
-  const dispatch = useDispatch();
+  const { lists, setlists } = useContext(listcontext);
+  const fetch = async () => {
+    const data = await axios.get(`${BASE_URL}/get`);
+
+    setlists(data?.data);
+  };
+
   const remover = async (id) => {
     try {
       await axios.delete(`${BASE_URL}/${id}`);
-      dispatch(getLists());
+      fetch();
       console.log("deleted");
     } catch (error) {
       console.log(error);
@@ -28,7 +33,7 @@ const Listing = ({ list }) => {
         title: uptext,
         status: false,
       });
-      dispatch(getLists());
+      fetch();
       setupdating(false);
       console.log("updated");
     } catch (error) {
@@ -37,7 +42,7 @@ const Listing = ({ list }) => {
   };
   return (
     <div>
-      <div className="flex items-center justify-center mt-4">
+      <div className="flex flex-col items-center justify-center mt-4">
         <div className="flex w-full items-center justify-center">
           {updating && (
             <>
@@ -57,10 +62,10 @@ const Listing = ({ list }) => {
             </>
           )}
         </div>
-        {!updating && (
-          <>
-            <div className="flex w-full ">
-              <p className="pr-3" onClick={() => updateclick(list._id)}>
+        <div className="flex flex-col items-center justify-center">
+          {lists?.map((list, index) => (
+            <div key={index} className="flex items-center justify-center  ">
+              <p className="text-black" onClick={() => updateclick(list._id)}>
                 {list.title}
               </p>
               <button
@@ -70,8 +75,8 @@ const Listing = ({ list }) => {
                 remove
               </button>
             </div>
-          </>
-        )}
+          ))}
+        </div>
       </div>
     </div>
   );
